@@ -1,2 +1,8 @@
-# Help-With-Format
-Just a formatting guide for ada
+# use this for title
+
+## use this for subtitle
+ - Use this for bullet points
+** Use this for bolding**
+Use the lines below for a new line
+
+---
