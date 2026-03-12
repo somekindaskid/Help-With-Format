@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pygame Live Coding: The Enemy Class</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; background: #f0f2f5; }
+        h1 { color: #2c3e50; text-align: center; }
+        .step { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 6px solid #3498db; }
+        pre { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        code { font-family: 'Courier New', Courier, monospace; }
+        .highlight { color: #e67e22; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Building the Patrol Goblin</h1>
+
+    <div class="step">
+        <h2>Step 1: Setup & Environment</h2>
+        <p>Start by initializing Pygame and setting up your window and background. We also need a <code>clock</code> to control our frame rate (27 FPS).</p>
+        <pre><code>import pygame
+pygame.init()
+win = pygame.display.set_mode((500,480))
+pygame.display.set_caption("First Game")
+bg = pygame.image.load('Assets/bg.jpg')
+clock = pygame.time.Clock()</code></pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 2: Defining the Enemy Class & Assets</h2>
+        <p>We define the <code>enemy</code> class. Inside, we load the animation frames into lists. These are shared by all instances of the enemy.</p>
+        <pre><code>class enemy(object):
+    walkRight = [pygame.image.load('Assets/R1E.png'), ... , pygame.image.load('Assets/R11E.png')]
+    walkLeft = [pygame.image.load('Assets/L1E.png'), ... , pygame.image.load('Assets/L11E.png')]</code></pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 3: The Constructor (<code>__init__</code>)</h2>
+        <p>This is where we define the goblin's "DNA." We give it a position, dimensions, a <code>path</code> (start/end x-coordinates), and a <code>walkCount</code> for animation.</p>
+        <pre><code>def __init__(self, x, y, width, height, end):
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+    self.path = [x, end]
+    self.walkCount = 0
+    self.vel = 3</code></pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 4: Movement Logic</h2>
+        <p>The <code>move()</code> method checks if the goblin has hit its <code>path</code> boundaries. If it hits the end, we flip the <code>vel</code> to negative to make it walk back.</p>
+        <pre><code>def move(self):
+    if self.vel > 0: # Moving Right
+        if self.x < self.path[1] + self.vel:
+            self.x += self.vel
+        else:
+            self.vel = self.vel * -1
+            self.walkCount = 0
+    # ... Same logic for moving left ...</code></pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 5: The Draw Method</h2>
+        <p>This method draws the goblin. It uses <code>self.walkCount // 3</code> to slow the animation down so it doesn't look like he's vibrating!</p>
+        <pre><code>def draw(self, win):
+    self.move() # Move before drawing
+    if self.walkCount + 1 >= 33:
+        self.walkCount = 0
+    
+    if self.vel > 0: # Draw walking right
+        win.blit(self.walkRight[self.walkCount//3], (self.x, self.y))
+        self.walkCount += 1
+    else: # Draw walking left
+        win.blit(self.walkLeft[self.walkCount//3], (self.x, self.y))
+        self.walkCount += 1</code></pre>
+    </div>
+
+    <div class="step">
+        <h2>Step 6: Refactoring the Main Loop</h2>
+        <p>We create a <code>redrawGameWindow()</code> function to keep the loop clean. We then create our <code>goblin</code> object and start the loop.</p>
+        <pre><code>def redrawGameWindow():
+    win.blit(bg, (0,0))
+    goblin.draw(win)    
+    pygame.display.update()
+
+goblin = enemy(20, 310, 64, 64, 450)
+
+# The Main Loop calls redrawGameWindow() every frame!</code></pre>
+    </div>
+
+</body>
+</html>
